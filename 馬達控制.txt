@@ -1,0 +1,149 @@
+#include<Stepper.h>
+#define STEPS 1024
+#define AD_pin A2
+
+int STBY=10;
+int PWMA=3;
+int AIN1=8;
+int AIN2=9;
+int test2;
+
+Stepper stepper1(48,22,26,24,28);
+Stepper stepper2(48,30,34,32,36);
+Stepper stepper3(48,38,42,40,44);
+
+//===============================================================
+void setup()
+{
+
+
+  
+Serial.begin(9600);
+stepper1.setSpeed(120);
+stepper2.setSpeed(120);
+stepper3.setSpeed(120);
+
+pinMode(PWMA,OUTPUT);
+pinMode(AIN1,OUTPUT);
+pinMode(AIN2,OUTPUT);
+}
+
+//================================================================
+void loop() 
+{ 
+  AD_check();
+  weight();
+  move(1, 255, 1); 
+  delay(2022);
+  stop();
+  AD_check();
+  weight();
+  stepmotor_1(); 
+  delay(250); 
+  AD_check();
+  weight();
+  move(1, 255, 1); 
+  delay(2022);
+  stop();
+  AD_check();
+  weight();
+  stepmotor_2(); 
+  delay(250);
+  AD_check();
+  weight();
+  move(1, 255, 1); 
+  delay(2022);
+  stop();
+  AD_check();
+  weight();
+  stepmotor_3(); 
+  delay(250);
+
+  move(1, 255, 0); 
+  delay(6066);
+  stop();
+  delay(250);
+}
+
+
+//================================================================
+
+void stepmotor_1()
+{
+  stepper1.step(600);
+  delay(1000);
+  stepper1.step(-600);
+}
+
+void stepmotor_2()
+{
+  stepper2.step(600);
+  delay(1000);
+  stepper2.step(-600);
+}
+
+void stepmotor_3()
+{
+  stepper3.step(600);
+  delay(1000);
+  stepper3.step(-600);
+}
+
+//=======================================================
+void move(int motor, int speed, int direction)
+{
+
+  digitalWrite(STBY, HIGH); //disable standby
+
+  boolean inPin1 = LOW;
+  boolean inPin2 = HIGH;
+
+  if(direction == 1){
+    inPin1 = HIGH;
+    inPin2 = LOW;
+  }
+  else
+  {
+    inPin1 = LOW;
+    inPin2 = HIGH;
+  }
+
+
+    digitalWrite(AIN1, inPin1);
+    digitalWrite(AIN2, inPin2);
+    analogWrite(PWMA, speed);
+
+}
+//=======================================================================================
+void stop()
+{ 
+  digitalWrite(STBY, LOW); 
+}
+//=========================================================================================
+void AD_check()
+{
+ int AD_value=analogRead(AD_pin);
+ int  test=map(AD_value,0,1023,0,10);
+  test2=test;
+  delay(1000);
+  Serial.println(test);
+  Serial.println("NOT_check");
+}
+//==================================
+void weight()
+{
+ while(test2>6)
+{
+  int AD_value=analogRead(AD_pin);
+  int  test=map(AD_value,0,1023,0,10);
+   Serial.println(test);
+   Serial.println(test2);
+      test2=test;
+ }
+  int AD_value=analogRead(AD_pin);
+  int  test=map(AD_value,0,1023,0,10);
+  delay(1000);
+ Serial.println(test2);
+ Serial.println("check");
+   test2=test;
+}
